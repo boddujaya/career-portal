@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Open Jobs | NorthBridge Consulting</title>
+  <title>Register | NorthBridge Consulting Careers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -15,11 +15,11 @@
       <a href="index.html" class="brand">NorthBridge<span>Consulting</span></a>
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="jobs.html" class="active">Jobs</a>
+        <a href="jobs.html">Jobs</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
         <a href="admin.html" class="admin-link">Admin</a>
-        <a href="register.html" id="registerNav">Register</a>
+        <a href="register.html" class="active" id="registerNav">Register</a>
         <a href="login.html" id="loginNav">Login</a>
         <button id="logoutBtn" class="nav-logout hidden" type="button">Logout</button>
         <span id="authStatus" class="auth-pill hidden"></span>
@@ -28,44 +28,35 @@
   </header>
 
   <main class="page-main">
-    <section class="container">
-      <div class="page-head">
-        <p class="eyebrow">Open Positions</p>
-        <h1>Find your next role</h1>
-        <p class="lead">Search and filter current opportunities across consulting practices.</p>
-      </div>
-
-      <div class="filters">
-        <label>
-          Search
-          <input id="searchInput" type="text" placeholder="Role title or keyword">
-        </label>
-        <label>
-          Location
-          <select id="locationFilter">
-            <option value="">All locations</option>
-          </select>
-        </label>
-        <label>
-          Job Type
-          <select id="typeFilter">
-            <option value="">All types</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Contract">Contract</option>
-            <option value="Internship">Internship</option>
-          </select>
-        </label>
-      </div>
-
-      <section id="jobList" class="job-list" aria-live="polite"></section>
+    <section class="container auth-wrap">
+      <article class="auth-card">
+        <h1>Create Account</h1>
+        <p class="lead">Register to manage job postings on the admin portal.</p>
+        <form id="registerForm" class="job-form">
+          <label>Full Name
+            <input id="regName" type="text" required>
+          </label>
+          <label>Email
+            <input id="regEmail" type="email" required>
+          </label>
+          <label>Password
+            <input id="regPassword" type="password" minlength="6" required>
+          </label>
+          <label>Confirm Password
+            <input id="regConfirmPassword" type="password" minlength="6" required>
+          </label>
+          <button class="btn btn-primary" type="submit">Register</button>
+          <p id="registerStatus" class="status-text" aria-live="polite"></p>
+        </form>
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </article>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-wrap">
       <p>&copy; <span id="year"></span> NorthBridge Consulting. All rights reserved.</p>
-      <a href="admin.html">Manage Jobs</a>
+      <a href="jobs.html">View Jobs</a>
     </div>
   </footer>
 

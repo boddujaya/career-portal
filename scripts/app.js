@@ -1,4 +1,6 @@
 const STORAGE_KEY = "northbridge.jobs";
+const USERS_KEY = "northbridge.users";
+const CURRENT_USER_KEY = "northbridge.currentUser";
 
 const seedJobs = [
   {
@@ -48,6 +50,28 @@ function getJobs() {
 
 function setJobs(jobs) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+}
+
+function getUsers() {
+  const raw = localStorage.getItem(USERS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+function setUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  const raw = localStorage.getItem(CURRENT_USER_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function setCurrentUser(user) {
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+}
+
+function clearCurrentUser() {
+  localStorage.removeItem(CURRENT_USER_KEY);
 }
 
 function formatDate(dateString) {
@@ -124,6 +148,10 @@ function renderAdminJobs() {
   const form = document.getElementById("jobForm");
   const container = document.getElementById("adminJobList");
   if (!form || !container) return;
+  if (!getCurrentUser()) {
+    window.location.href = "login.html?next=admin.html";
+    return;
+  }
 
   const fields = {
     id: document.getElementById("jobId"),
@@ -246,6 +274,115 @@ function setYear() {
   }
 }
 
+function parseNextUrl(defaultUrl) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("next") || defaultUrl;
+}
+
+function renderRegister() {
+  const registerForm = document.getElementById("registerForm");
+  if (!registerForm) return;
+
+  const status = document.getElementById("registerStatus");
+  registerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    status.classList.remove("error");
+
+    const name = document.getElementById("regName").value.trim();
+    const email = document.getElementById("regEmail").value.trim().toLowerCase();
+    const password = document.getElementById("regPassword").value;
+    const confirmPassword = document.getElementById("regConfirmPassword").value;
+
+    if (password !== confirmPassword) {
+      status.textContent = "Passwords do not match.";
+      status.classList.add("error");
+      return;
+    }
+
+    const users = getUsers();
+    const exists = users.some((user) => user.email === email);
+    if (exists) {
+      status.textContent = "Email is already registered. Please login.";
+      status.classList.add("error");
+      return;
+    }
+
+    const user = {
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      password
+    };
+    users.push(user);
+    setUsers(users);
+    setCurrentUser({ id: user.id, name: user.name, email: user.email });
+    status.textContent = "Registration successful. Redirecting...";
+    window.setTimeout(() => {
+      window.location.href = parseNextUrl("admin.html");
+    }, 600);
+  });
+}
+
+function renderLogin() {
+  const loginForm = document.getElementById("loginForm");
+  if (!loginForm) return;
+
+  const status = document.getElementById("loginStatus");
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    status.classList.remove("error");
+
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+    const users = getUsers();
+    const matched = users.find((user) => user.email === email && user.password === password);
+
+    if (!matched) {
+      status.textContent = "Invalid email or password.";
+      status.classList.add("error");
+      return;
+    }
+
+    setCurrentUser({ id: matched.id, name: matched.name, email: matched.email });
+    status.textContent = "Login successful. Redirecting...";
+    window.setTimeout(() => {
+      window.location.href = parseNextUrl("admin.html");
+    }, 500);
+  });
+}
+
+function renderAuthNav() {
+  const loginNav = document.getElementById("loginNav");
+  const registerNav = document.getElementById("registerNav");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const authStatus = document.getElementById("authStatus");
+  if (!logoutBtn) return;
+
+  const user = getCurrentUser();
+  if (user) {
+    if (loginNav) loginNav.classList.add("hidden");
+    if (registerNav) registerNav.classList.add("hidden");
+    logoutBtn.classList.remove("hidden");
+    if (authStatus) {
+      authStatus.textContent = `Signed in: ${user.name}`;
+      authStatus.classList.remove("hidden");
+    }
+  } else {
+    if (loginNav) loginNav.classList.remove("hidden");
+    if (registerNav) registerNav.classList.remove("hidden");
+    logoutBtn.classList.add("hidden");
+    if (authStatus) authStatus.classList.add("hidden");
+  }
+
+  logoutBtn.addEventListener("click", () => {
+    clearCurrentUser();
+    window.location.href = "index.html";
+  });
+}
+
 setYear();
+renderAuthNav();
 renderPublicJobs();
 renderAdminJobs();
+renderRegister();
+renderLogin();
